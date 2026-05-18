@@ -1,0 +1,33 @@
+<svg width="192" height="192" viewBox="0 0 192 192" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">CineData Explorer</title>
+  <desc id="desc">Logo con una pantalla de cine, un pin de mapa y barras de datos.</desc>
+  <defs>
+    <linearGradient id="gold" x1="32" y1="24" x2="164" y2="168" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F7D66B"/>
+      <stop offset="0.55" stop-color="#D4A72C"/>
+      <stop offset="1" stop-color="#B88912"/>
+    </linearGradient>
+    <linearGradient id="dark" x1="42" y1="48" x2="148" y2="150" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2A1A12"/>
+      <stop offset="1" stop-color="#090807"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="192" height="192" rx="48" fill="#FFFDF9"/>
+  <rect x="18" y="18" width="156" height="156" rx="38" fill="url(#gold)"/>
+  <rect x="38" y="48" width="116" height="88" rx="18" fill="url(#dark)"/>
+
+  <path d="M48 65H144" stroke="#FFF6D8" stroke-width="10" stroke-linecap="round" stroke-dasharray="14 13"/>
+  <path d="M58 137H134" stroke="#FFF6D8" stroke-width="10" stroke-linecap="round"/>
+
+  <path d="M96 76C82.2 76 71 86.9 71 100.5C71 119 96 144 96 144C96 144 121 119 121 100.5C121 86.9 109.8 76 96 76Z" fill="#F8F5EF"/>
+  <circle cx="96" cy="100" r="11" fill="#D13239"/>
+
+  <rect x="58" y="113" width="10" height="14" rx="5" fill="#2DD4BF"/>
+  <rect x="73" y="105" width="10" height="22" rx="5" fill="#60A5FA"/>
+  <rect x="119" y="95" width="10" height="32" rx="5" fill="#F97316"/>
+  <rect x="134" y="86" width="10" height="41" rx="5" fill="#A78BFA"/>
+
+  <circle cx="148" cy="48" r="13" fill="#D13239"/>
+  <path d="M143 48H153M148 43V53" stroke="#FFFDF9" stroke-width="4" stroke-linecap="round"/>
+</svg>
