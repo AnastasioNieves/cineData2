@@ -1,4 +1,4 @@
-import { TMDB_API_KEY } from "../config.env";
+import { TMDB_API_KEY } from "./config.env";
 
 const BASE_URL = "https://api.themoviedb.org/3";
 const DEFAULT_LANGUAGE = "es-ES";
