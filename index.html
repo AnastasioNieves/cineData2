@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description"
+    content="CineData Explorer: buscador de peliculas con TheMovieDB, Leaflet, Chart.js y localStorage." />
+  <title>CineData Explorer</title>
+  <link rel="icon" href="./img/logo.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link rel="preconnect" href="https://unpkg.com" />
+  <link rel="stylesheet" href="./css/styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js" defer></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
+  <script type="module" src="./js/main.js"></script>
+</head>
+
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <img class="brand-logo" src="./img/logo.svg" alt="" aria-hidden="true" />
+      <div>
+        <h1>CineData Explorer</h1>
+        <p>Peliculas, paises, generos y ratings en una sola vista.</p>
+      </div>
+    </div>
+    <button class="icon-button" id="themeToggle" type="button" aria-label="Cambiar a modo oscuro"
+      aria-pressed="false"></button>
+  </header>
+
+  <main class="app-shell">
+    <section class="search-panel" aria-labelledby="searchTitle">
+      <button id="toggleFilters" class="filters-toggle is-collapsed" type="button" aria-expanded="false"
+        aria-controls="filtersContent">Filtros</button>
+      <div id="filtersContent" class="filters-content collapsed">
+        <div class="section-heading">
+          <h2 id="searchTitle">Busqueda</h2>
+        </div>
+
+        <form class="search-form" id="searchForm">
+          <label class="sr-only" for="searchInput">Buscar pelicula</label>
+          <input id="searchInput" name="query" type="search" placeholder="Matrix, Amelie, Parasite..."
+            autocomplete="off" />
+          <div class="search-actions">
+            <button type="submit">Buscar</button>
+            <button id="clearFilters" type="button">Limpiar filtros</button>
+          </div>
+        </form>
+
+        <div class="filters" aria-label="Filtros de resultados">
+          <label>Genero <select id="genreFilter"></select></label>
+          <label>Anio <input id="yearFilter" type="number" min="1888" max="2035" placeholder="2024" /></label>
+          <label>
+            Rating minimo
+            <input id="ratingFilter" type="range" min="0" max="10" step="0.5" value="0" />
+            <span id="ratingValue">0</span>
+          </label>
+        </div>
+
+        <div class="history-row">
+          <h3>Ultimas busquedas</h3>
+          <button class="ghost-button" id="clearHistory" type="button">Limpiar</button>
+        </div>
+        <div id="historyList" class="history-list" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="results-panel" aria-labelledby="resultsTitle">
+      <div class="section-heading">
+        <h2 id="resultsTitle">Resultados</h2>
+        <span id="resultsCount" class="muted">0 peliculas</span>
+      </div>
+      <div id="message" class="message" role="status"></div>
+      <div id="resultsGrid" class="results-grid"></div>
+      <button id="loadMore" class="load-more" type="button" hidden>Cargar mas peliculas</button>
+    </section>
+
+  </main>
+
+  <div class="detail-modal" id="detailModal" role="dialog" aria-modal="true" aria-labelledby="detailModalTitle"
+    hidden>
+    <article class="detail-dialog">
+      <header class="modal-header">
+        <div>
+          <span class="muted">Detalle seleccionado</span>
+          <h2 id="detailModalTitle">Ficha de pelicula</h2>
+        </div>
+        <button class="modal-close" id="closeDetail" type="button" aria-label="Cerrar detalle">&times;</button>
+      </header>
+
+      <article class="movie-detail" id="movieDetail">
+        <div class="empty-state">
+          <h2 id="detailTitle">Selecciona una pelicula</h2>
+          <p>El mapa y las graficas se actualizaran con datos de la pelicula elegida.</p>
+        </div>
+      </article>
+
+      <div class="detail-bottom">
+        <section class="map-card" aria-labelledby="mapTitle">
+          <div class="section-heading compact">
+            <h2 id="mapTitle">Produccion</h2>
+            <span id="countryCount" class="muted">0 paises</span>
+          </div>
+          <div id="map" class="production-map" aria-label="Mapa Leaflet de paises de produccion"></div>
+          <div id="countryList" class="country-list">Selecciona una pelicula para ver paises.</div>
+        </section>
+
+        <section class="charts-card" aria-labelledby="chartsTitle">
+          <div class="section-heading compact">
+            <h2 id="chartsTitle">Estadisticas</h2>
+            <span class="muted">Datos dinamicos</span>
+          </div>
+          <div class="chart-stack">
+            <div class="chart-box">
+              <h3>Generos</h3>
+              <canvas id="genreChart" aria-label="Grafica doughnut de generos"></canvas>
+            </div>
+            <div class="chart-box">
+              <h3>Popularidad</h3>
+              <canvas id="popularityChart" aria-label="Grafica de popularidad"></canvas>
+            </div>
+          </div>
+        </section>
+      </div>
+    </article>
+  </div>
+</body>
+
+</html>
