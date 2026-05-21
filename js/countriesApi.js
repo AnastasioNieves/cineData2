@@ -1,6 +1,8 @@
 const REST_COUNTRIES_URL = "https://restcountries.com/v3.1/alpha";
 const COUNTRY_CACHE_KEY = "cinedata:country-coordinates";
 
+// Coordenadas locales para paises frecuentes. Son respaldo cuando REST Countries
+// falla, no responde o no devuelve lat/lng para un codigo recibido desde TMDb.
 const fallbackCoordinates = {
   AR: [-38.4161, -63.6167],
   AU: [-25.2744, 133.7751],
@@ -69,6 +71,7 @@ export const getCountryLocation = async ({ iso_3166_1: code, name } = {}) => {
   }
 
   try {
+    // Se consulta por codigo ISO porque TMDb entrega paises normalizados.
     const response = await fetch(
       `${REST_COUNTRIES_URL}/${normalizedCode}?fields=name,latlng,cca2`
     );

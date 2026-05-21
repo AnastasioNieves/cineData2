@@ -1,5 +1,7 @@
 import { TMDB_API_KEY } from "./config.js";
 
+// Capa unica de acceso a TheMovieDB. Centralizar aqui las llamadas evita repetir
+// URLs, idioma, API key y manejo de errores en el resto de la aplicacion.
 const BASE_URL = "https://api.themoviedb.org/3";
 const DEFAULT_LANGUAGE = "es-ES";
 const API_KEY_STORAGE_KEY = "cinedata:tmdb-api-key";
@@ -46,11 +48,14 @@ const fetchFromTmdb = async (endpoint, params = {}, options = {}) => {
   return response.json();
 };
 
+// Catalogo maestro de generos: se carga una vez al iniciar para traducir ids a nombres.
 export const getGenres = async () => {
   const data = await fetchFromTmdb("/genre/movie/list");
   return data.genres;
 };
 
+// Busqueda paginada. El AbortController se pasa desde main.js para cancelar
+// peticiones antiguas cuando el usuario sigue escribiendo.
 export const searchMovies = async (query, page = 1, options = {}) => {
   return fetchFromTmdb(
     "/search/movie",
@@ -62,11 +67,13 @@ export const searchMovies = async (query, page = 1, options = {}) => {
     options
   );
 };
+
+// Dataset inicial para que la app tenga contenido y graficas nada mas abrir.
 export const getPopularMovies = async (page = 1, options = {}) => {
   return fetchFromTmdb("/movie/popular", { page }, options);
 };
 
+// Detalle bajo demanda: solo se pide al abrir una ficha para no cargar datos innecesarios.
 export const getMovieDetails = async (movieId, options = {}) => {
   return fetchFromTmdb(`/movie/${movieId}`, {}, options);
 };
-+3

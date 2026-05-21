@@ -1,6 +1,8 @@
 import { getGenresWithCount } from "./filters.js";
 import { escapeHtml, formatMovieCount } from "./utils.js";
 
+// Modulo de presentacion: transforma datos ya preparados en nodos/markup.
+// La logica de negocio vive fuera, para mantener la UI facil de razonar.
 const createPosterMarkup = (movie) => {
   const title = escapeHtml(movie.title);
 
@@ -18,6 +20,7 @@ const createOverviewMarkup = (overview = "", maxLength = 100) => {
 
   const shortOverview = `${cleanOverview.slice(0, maxLength).trim()}...`;
 
+  // details/summary da "leer mas" sin estado JavaScript adicional.
   return `
     <details class="movie-overview movie-overview-details">
       <summary>

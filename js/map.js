@@ -1,5 +1,7 @@
 import { getCountryLocations } from "./countriesApi.js";
 
+// El mapa usa Leaflet con CRS.Simple sobre una imagen mundial fija. Esa decision
+// permite mostrar siempre el mundo completo dentro del modal sin scroll ni zoom.
 const BASE_MAP_PANE = "worldMapImage";
 const MARKER_PANE = "productionMarkers";
 const WORLD_MAP_URL =
@@ -71,6 +73,7 @@ const openCountryPopup = (country) => {
 const renderPins = (locations = []) => {
   pinLayer.innerHTML = "";
 
+  // Capa HTML adicional para que las chinchetas sean faciles de estilizar y enfocar.
   locations.forEach((country) => {
     const button = document.createElement("button");
     const position = getPinPosition(country.latlng);
@@ -157,6 +160,7 @@ export const updateProductionMap = async (countries = [], options = {}) => {
   const locations = await getCountryLocations(countries);
   if (options.signal?.aborted) return [];
 
+  // Leaflet mantiene popups y accesibilidad; la capa HTML refuerza el estilo visual.
   locations.forEach((country) => {
     L.marker(toMapPoint(country.latlng), {
       alt: `Chincheta de ${country.name}`,

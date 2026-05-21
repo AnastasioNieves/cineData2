@@ -1,4 +1,5 @@
 :root {
+  /* Tokens globales: cambiar tema, radios o acentos se hace desde aqui. */
   color-scheme: light;
   --bg: #f6f1e8;
   --surface: #fffdf9;
@@ -101,6 +102,7 @@ button:disabled {
 }
 
 .app-shell {
+  /* Layout principal: panel de control a la izquierda y resultados fluidos. */
   display: grid;
   grid-template-columns: minmax(300px, 340px) minmax(0, 1fr);
   gap: 1rem;
@@ -508,6 +510,7 @@ button:disabled {
 }
 
 .detail-modal {
+  /* Modal fijo para mantener la ficha, el mapa y las graficas en contexto. */
   position: fixed;
   inset: 0;
   z-index: 1000;
@@ -605,6 +608,7 @@ button:disabled {
 }
 
 body.dark {
+  /* Tema oscuro persistido desde localStorage y aplicado sin duplicar componentes. */
   color-scheme: dark;
   --bg: #050505;
   --surface: #111111;
@@ -643,6 +647,7 @@ body.dark .production-map .leaflet-image-layer {
 }
 
 @media (max-width: 760px) {
+  /* En movil todo pasa a una columna para priorizar lectura y tactil. */
   .app-header,
   .brand,
   .selected-movie,

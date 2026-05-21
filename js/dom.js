@@ -1,3 +1,5 @@
+// Punto unico de referencias del DOM. Asi el resto de modulos no depende de
+// selectores repetidos y el HTML puede cambiarse desde una sola lista.
 export const elements = {
   toggleFilters: document.querySelector("#toggleFilters"),
   filtersContent: document.querySelector("#filtersContent"),

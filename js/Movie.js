@@ -1,5 +1,7 @@
 const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
 
+// Modelo de dominio. Convierte la respuesta irregular de TMDb en un objeto estable
+// para que filtros, tarjetas, modal y graficas trabajen siempre con la misma forma.
 export class Movie {
   #raw;
 
@@ -21,6 +23,7 @@ export class Movie {
     this.runtime = Number(movieData.runtime) || null;
   }
 
+  // Getter derivado: evita recalcular y repetir parseos de fecha por toda la UI.
   get year() {
     const parsedYear = Number.parseInt(this.releaseDate.slice(0, 4), 10);
     return Number.isNaN(parsedYear) ? "s/f" : parsedYear;
@@ -42,6 +45,7 @@ export class Movie {
     return { ...this.#raw };
   }
 
+  // Mantiene la pelicula como instancia de Movie cuando llega el detalle ampliado.
   withDetails(details) {
     return new Movie({ ...this.#raw, ...details }, this.genres);
   }

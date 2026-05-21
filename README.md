@@ -1,4 +1,4 @@
-# CineData Explorer
+﻿# CineData Explorer
 
 <p align="center">
   <img src="./img/logo.svg" alt="Logo de CineData Explorer" width="120" />
@@ -6,32 +6,35 @@
 
 CineData Explorer es una aplicacion web interactiva para buscar peliculas con TheMovieDB, explorar sus paises de produccion en un mapa Leaflet y analizar generos y popularidad mediante graficas Chart.js.
 
-La app esta pensada como proyecto integrador de JavaScript avanzado: usa modulos ES6, `async/await`, clases, funciones puras, persistencia en `localStorage`, filtros, tema oscuro y una interfaz responsive preparada para GitHub Pages.
+La app esta pensada como proyecto integrador de JavaScript avanzado: usa modulos ES6, `async/await`, clases, funciones puras, persistencia en `localStorage`, filtros, tema claro/oscuro y una interfaz responsive preparada para GitHub Pages.
+
+## Capturas
+
+### Vista principal
+
+![Vista principal de CineData Explorer](./img/capturas/home.png)
+
+### Modal de detalle
+
+![Modal con ficha, mapa y graficas](./img/capturas/modal-detalle.png)
 
 ## Funcionalidades
 
 - Busqueda de peliculas con `debounce` para evitar peticiones excesivas.
-- Consumo de la API de TheMovieDB con `fetch`, `async/await` y manejo de errores.
-- Clase `Movie` para modelar cada pelicula y centralizar datos derivados.
+- Consumo de TheMovieDB con `fetch`, `async/await`, `try/catch` y `AbortController`.
+- Clase `Movie` para normalizar peliculas y centralizar datos derivados.
 - Filtros por genero, anio y rating minimo mediante funciones puras.
 - Historial de las ultimas 10 busquedas guardado en `localStorage`.
 - Modo claro/oscuro persistido entre sesiones.
 - Paginacion de resultados con el boton `Cargar mas peliculas`.
-- Modal centrado con ficha de la pelicula seleccionada.
+- Modal centrado con ficha completa de la pelicula seleccionada.
 - Mapa Leaflet 1.9 con chinchetas de los paises de produccion.
 - Grafica doughnut de generos y grafica de barras de popularidad con Chart.js.
+- Interfaz responsive con HTML semantico y estados accesibles.
 
-## Logo
+## Arquitectura
 
-El logotipo esta en:
-
-```text
-img/logo.svg
-```
-
-Representa las tres ideas centrales del proyecto: cine, datos y exploracion geografica. Se usa en la cabecera de la app y tambien como favicon.
-
-## Estructura del proyecto
+La aplicacion esta separada por responsabilidades para que cada archivo tenga una funcion clara:
 
 ```text
 cineData/
@@ -41,6 +44,9 @@ cineData/
     styles.css
   img/
     logo.svg
+    capturas/
+      home.png
+      modal-detalle.png
   js/
     api.js
     charts.js
@@ -57,20 +63,54 @@ cineData/
     utils.js
 ```
 
-## Arquitectura
+```mermaid
+flowchart LR
+  UI["index.html + eventos"] --> MAIN["main.js"]
+  MAIN --> API["api.js / TMDb"]
+  MAIN --> MODEL["Movie.js"]
+  MAIN --> FILTERS["filters.js"]
+  MAIN --> RENDER["render.js"]
+  MAIN --> MAP["map.js / Leaflet"]
+  MAIN --> CHARTS["charts.js / Chart.js"]
+  MAIN --> STORAGE["storage.js / localStorage"]
+  MAP --> COUNTRIES["countriesApi.js / REST Countries"]
+```
 
-La aplicacion esta separada por responsabilidades:
+## Modulos clave
 
-- `main.js`: punto de entrada, estado principal y eventos del DOM.
-- `api.js`: llamadas a TheMovieDB.
-- `Movie.js`: clase de dominio para normalizar y enriquecer peliculas.
-- `filters.js`: transformaciones y filtros puros.
-- `render.js`: funciones de pintado de interfaz.
-- `dom.js`: referencias a elementos HTML.
-- `map.js`: inicializacion y actualizacion del mapa Leaflet.
-- `charts.js`: inicializacion y actualizacion de graficas Chart.js.
-- `storage.js`: lectura y escritura en `localStorage`.
-- `utils.js`: utilidades compartidas como `debounce`, formateadores y escape HTML.
+- `main.js`: punto de entrada, estado principal, eventos del DOM, busquedas, filtros y seleccion de peliculas.
+- `api.js`: capa unica de acceso a TheMovieDB; centraliza URL base, idioma, API key y errores.
+- `Movie.js`: clase de dominio que convierte la respuesta de TMDb en un objeto estable para toda la UI.
+- `filters.js`: funciones puras para filtrar por genero, anio y rating, y preparar datasets.
+- `render.js`: funciones de pintado de tarjetas, historial, detalle y paises.
+- `map.js`: inicializacion y actualizacion del mapa Leaflet con chinchetas de produccion.
+- `charts.js`: inicializacion y actualizacion de las graficas de genero y popularidad.
+- `countriesApi.js`: obtencion de coordenadas por codigo ISO con cache y fallback local.
+- `storage.js`: lectura/escritura defensiva en `localStorage`.
+- `utils.js`: utilidades compartidas como `debounce`, formateadores y `escapeHtml`.
+
+## Flujo de uso
+
+1. La app carga generos y peliculas populares al iniciar.
+2. El usuario busca una pelicula o ajusta filtros.
+3. `main.js` actualiza el estado y llama a `render.js` para repintar tarjetas.
+4. Al seleccionar una pelicula, se pide el detalle completo a TMDb.
+5. La pelicula se transforma de nuevo en una instancia de `Movie`.
+6. El modal muestra ficha, paises, mapa Leaflet y graficas Chart.js.
+7. El historial y el tema se conservan en `localStorage`.
+
+## Decisiones tecnicas para defender
+
+- **Modulos ES6:** el codigo esta dividido por responsabilidad y se importa solo lo necesario.
+- **Clase `Movie`:** encapsula datos derivados como `year`, `posterUrl`, `genreNames` y `formattedRating`.
+- **Funciones puras:** los filtros no modifican el array original, devuelven nuevas colecciones.
+- **`AbortController`:** cancela busquedas o detalles anteriores para evitar resultados desordenados.
+- **Cache en memoria:** el detalle de una pelicula se guarda en `detailCache` para no repetir llamadas.
+- **`localStorage`:** persiste historial, tema y cache de coordenadas sin backend.
+- **Leaflet + REST Countries:** convierte paises de produccion en puntos visibles sobre un mapa mundial.
+- **Chart.js:** transforma los resultados filtrados en graficas actualizadas en tiempo real.
+- **`escapeHtml`:** sanea texto externo antes de insertarlo como HTML.
+- **Responsive design:** la interfaz pasa a una columna en pantallas pequenas.
 
 ## Configuracion de TheMovieDB
 
@@ -79,7 +119,7 @@ La app necesita una API key de TheMovieDB para cargar datos reales.
 1. Crea una cuenta gratuita en TheMovieDB.
 2. Genera una API key.
 3. Copia `js/config.example.js` como referencia.
-4. Edita `js/config.js`:
+4. Crea o edita `js/config.js`:
 
 ```js
 export const TMDB_API_KEY = "TU_API_KEY_AQUI";
@@ -93,11 +133,11 @@ localStorage.setItem("cinedata:tmdb-api-key", "TU_API_KEY_AQUI");
 
 Despues recarga la pagina.
 
-Nota: al ser una aplicacion frontend estatica, cualquier clave usada desde el navegador debe considerarse publica. Para una entrega real, conviene usar una clave restringida o de pruebas.
+> Nota: al ser una aplicacion frontend estatica, cualquier clave usada desde el navegador debe considerarse publica. Para una entrega real, conviene usar una clave restringida o de pruebas.
 
 ## Uso local
 
-Abre una terminal en la carpeta `cineData/` y levanta un servidor estatico. Por ejemplo, con Python:
+Abre una terminal en la carpeta `cineData/` y levanta un servidor estatico:
 
 ```bash
 python -m http.server 5500
@@ -111,26 +151,12 @@ http://localhost:5500
 
 Tambien puedes usar la extension Live Server de VS Code.
 
-## Uso de la app
-
-1. Escribe una pelicula en el buscador.
-2. Ajusta filtros por genero, anio o rating si lo necesitas.
-3. Haz clic en una tarjeta de pelicula.
-4. Revisa la ficha emergente con poster, descripcion, paises, mapa y graficas.
-5. Cierra el modal con el boton `x`, con la tecla `Escape` o haciendo clic fuera de la tarjeta.
-
-## Mapa y chinchetas
-
-El mapa usa Leaflet 1.9 con una vista mundial fija, sin zoom ni desplazamiento, para que siempre se vea completo dentro de la tarjeta del modal.
-
-Las chinchetas se colocan a partir de los paises de produccion que devuelve TheMovieDB. Si algun pais no tiene coordenadas en la fuente local/remota usada por `countriesApi.js`, se muestra en la lista de paises con una nota de coordenadas no disponibles.
-
 ## Despliegue en GitHub Pages
 
-1. Sube el proyecto dentro de la carpeta indicada por la entrega.
+1. Sube el proyecto al repositorio.
 2. En GitHub, entra en `Settings > Pages`.
-3. Selecciona la rama de entrega y la carpeta donde esta `index.html`.
-4. Publica la URL generada en el Pull Request.
+3. Selecciona la rama y la carpeta donde esta `index.html`.
+4. Publica la URL generada en la entrega o Pull Request.
 
 ## Checklist de requisitos
 
@@ -139,22 +165,23 @@ Las chinchetas se colocan a partir de los paises de produccion que devuelve TheM
 - [x] Clase `Movie`.
 - [x] Funciones puras para filtros y transformaciones.
 - [x] Buscador con `debounce`.
+- [x] Consumo de API externa con `fetch`.
 - [x] Mapa Leaflet con chinchetas.
 - [x] Grafica doughnut de generos con Chart.js.
 - [x] Grafica adicional de popularidad.
-- [x] `localStorage` para historial y tema.
+- [x] `localStorage` para historial, tema y cache.
 - [x] HTML semantico y CSS responsive.
 - [x] Preparada para GitHub Pages.
 
-## Capturas
+## Guion rapido de defensa
 
-Antes de abrir el Pull Request, anade aqui una captura de la vista principal y otra del modal de detalle.
+1. **Objetivo:** "CineData Explorer permite buscar peliculas y cruzar datos de cine con paises, generos y popularidad."
+2. **Arquitectura:** "La app esta separada en modulos: API, modelo, filtros, render, mapa, graficas y persistencia."
+3. **JavaScript avanzado:** "Uso `async/await`, `AbortController`, clase `Movie`, funciones puras y `localStorage`."
+4. **Visualizacion:** "Leaflet muestra paises de produccion y Chart.js resume generos y popularidad."
+5. **Experiencia de usuario:** "Tiene tema persistente, filtros, historial, modal accesible y diseno responsive."
+6. **Mejora futura:** "El siguiente paso seria mover la API key a un backend o proxy para no exponerla en frontend."
 
-```text
-img/captura-home.png
-img/captura-modal.png
-```
+## Logo
 
-## Enlace al despliegue
-
-Anade aqui la URL publica de GitHub Pages cuando este publicado.
+El logotipo esta en `img/logo.svg` y representa las tres ideas centrales del proyecto: cine, datos y exploracion geografica. Se usa en la cabecera de la app y tambien como favicon.
