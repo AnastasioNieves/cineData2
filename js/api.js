@@ -77,3 +77,4 @@ export const getPopularMovies = async (page = 1, options = {}) => {
 export const getMovieDetails = async (movieId, options = {}) => {
   return fetchFromTmdb(`/movie/${movieId}`, {}, options);
 };
++3
