@@ -1,3 +1,11 @@
+const HTML_ESCAPE_CHARACTERS = {
+  "&": "&amp;",
+  "<": "&lt;",
+  ">": "&gt;",
+  '"': "&quot;",
+  "'": "&#039;"
+};
+
 export const debounce = (callback, delay = 450) => {
   let timeoutId;
 
@@ -12,17 +20,7 @@ export const debounce = (callback, delay = 450) => {
 // Sanitiza texto externo antes de insertarlo como HTML. TMDb es una fuente
 // confiable, pero esta capa evita inyecciones si cambia el origen de datos.
 export const escapeHtml = (value = "") =>
-  String(value).replace(/[&<>"']/g, (character) => {
-    const replacements = {
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#039;"
-    };
-
-    return replacements[character];
-  });
+  String(value).replace(/[&<>"']/g, (character) => HTML_ESCAPE_CHARACTERS[character]);
 
 export const formatMovieCount = (count) =>
   `${count} ${count === 1 ? "pelicula" : "peliculas"}`;

@@ -1,4 +1,4 @@
-﻿# CineData Explorer
+# CineData Explorer
 
 <p align="center">
   <img src="./img/logo.svg" alt="Logo de CineData Explorer" width="120" />
@@ -7,6 +7,10 @@
 CineData Explorer es una aplicacion web interactiva para buscar peliculas con TheMovieDB, explorar sus paises de produccion en un mapa Leaflet y analizar generos y popularidad mediante graficas Chart.js.
 
 La app esta pensada como proyecto integrador de JavaScript avanzado: usa modulos ES6, `async/await`, clases, funciones puras, persistencia en `localStorage`, filtros, tema claro/oscuro y una interfaz responsive preparada para GitHub Pages.
+
+## Branding
+
+La guia de marca para adaptar la app a la paleta visual de The Bridge esta en [`BRANDING_GUIDE.md`](./BRANDING_GUIDE.md).
 
 ## Capturas
 
@@ -40,6 +44,7 @@ La aplicacion esta separada por responsabilidades para que cada archivo tenga un
 cineData/
   index.html
   README.md
+  BRANDING_GUIDE.md
   css/
     styles.css
   img/
@@ -48,6 +53,32 @@ cineData/
       home.png
       modal-detalle.png
   js/
+    controllers/
+      detailController.js
+      eventsController.js
+      filterController.js
+      searchController.js
+      themeController.js
+    services/
+      movieService.js
+    settings/
+      appSettings.js
+    state/
+      appState.js
+    ui/
+      appView.js
+    renderers/
+      countryRenderer.js
+      detailRenderer.js
+      filterRenderer.js
+      historyRenderer.js
+      posterMarkup.js
+      resultsRenderer.js
+    map/
+      mapConfig.js
+      mapProjection.js
+      pinLayer.js
+      productionIcon.js
     api.js
     charts.js
     config.example.js
@@ -65,24 +96,37 @@ cineData/
 
 ```mermaid
 flowchart LR
-  UI["index.html + eventos"] --> MAIN["main.js"]
-  MAIN --> API["api.js / TMDb"]
-  MAIN --> MODEL["Movie.js"]
-  MAIN --> FILTERS["filters.js"]
-  MAIN --> RENDER["render.js"]
-  MAIN --> MAP["map.js / Leaflet"]
-  MAIN --> CHARTS["charts.js / Chart.js"]
-  MAIN --> STORAGE["storage.js / localStorage"]
+  UI["index.html"] --> MAIN["main.js"]
+  MAIN --> CONTROLLERS["controllers / flujos de usuario"]
+  CONTROLLERS --> STATE["state/appState.js"]
+  CONTROLLERS --> SERVICES["services/movieService.js"]
+  CONTROLLERS --> VIEW["ui/appView.js"]
+  SERVICES --> API["api.js / TMDb"]
+  SERVICES --> MODEL["Movie.js"]
+  VIEW --> RENDER["render.js"]
+  RENDER --> RENDERERS["renderers / piezas de UI"]
+  VIEW --> FILTERS["filters.js"]
+  VIEW --> MAP["map.js / Leaflet"]
+  MAP --> MAP_HELPERS["map/ configuracion y chinchetas"]
+  VIEW --> CHARTS["charts.js / Chart.js"]
+  CONTROLLERS --> STORAGE["storage.js / localStorage"]
   MAP --> COUNTRIES["countriesApi.js / REST Countries"]
 ```
 
 ## Modulos clave
 
-- `main.js`: punto de entrada, estado principal, eventos del DOM, busquedas, filtros y seleccion de peliculas.
+- `main.js`: punto de entrada; inicializa tema, mapa, graficas, eventos y datos remotos.
+- `controllers/`: orquesta acciones de usuario: busqueda, filtros, detalle, tema y eventos del DOM.
+- `services/movieService.js`: traduce peticiones de TMDb a objetos `Movie` y encapsula cache de detalle.
+- `state/appState.js`: estado unico de la aplicacion y operaciones basicas sobre colecciones de peliculas.
+- `ui/appView.js`: funciones de vista que conectan renderizado, graficas, mensajes y refrescos visuales.
+- `renderers/`: piezas de presentacion separadas por zona: resultados, detalle, historial, filtros y paises.
+- `map/`: helpers del mapa para constantes, proyeccion, iconos y capa HTML de chinchetas.
+- `settings/appSettings.js`: constantes de negocio como limite inicial de peliculas y longitud minima de busqueda.
 - `api.js`: capa unica de acceso a TheMovieDB; centraliza URL base, idioma, API key y errores.
 - `Movie.js`: clase de dominio que convierte la respuesta de TMDb en un objeto estable para toda la UI.
 - `filters.js`: funciones puras para filtrar por genero, anio y rating, y preparar datasets.
-- `render.js`: funciones de pintado de tarjetas, historial, detalle y paises.
+- `render.js`: barril de exportaciones para mantener imports simples hacia `renderers/`.
 - `map.js`: inicializacion y actualizacion del mapa Leaflet con chinchetas de produccion.
 - `charts.js`: inicializacion y actualizacion de las graficas de genero y popularidad.
 - `countriesApi.js`: obtencion de coordenadas por codigo ISO con cache y fallback local.
@@ -93,9 +137,9 @@ flowchart LR
 
 1. La app carga generos y peliculas populares al iniciar.
 2. El usuario busca una pelicula o ajusta filtros.
-3. `main.js` actualiza el estado y llama a `render.js` para repintar tarjetas.
-4. Al seleccionar una pelicula, se pide el detalle completo a TMDb.
-5. La pelicula se transforma de nuevo en una instancia de `Movie`.
+3. Un controlador actualiza `state/appState.js` y delega el repintado en `ui/appView.js`.
+4. Al seleccionar una pelicula, `detailController.js` pide el detalle completo a TMDb.
+5. `movieService.js` transforma la respuesta en una instancia de `Movie`.
 6. El modal muestra ficha, paises, mapa Leaflet y graficas Chart.js.
 7. El historial y el tema se conservan en `localStorage`.
 
@@ -176,7 +220,7 @@ Tambien puedes usar la extension Live Server de VS Code.
 ## Guion rapido de defensa
 
 1. **Objetivo:** "CineData Explorer permite buscar peliculas y cruzar datos de cine con paises, generos y popularidad."
-2. **Arquitectura:** "La app esta separada en modulos: API, modelo, filtros, render, mapa, graficas y persistencia."
+2. **Arquitectura:** "La app separa entrada, controladores, servicios, estado, vistas, renderizadores, API y persistencia."
 3. **JavaScript avanzado:** "Uso `async/await`, `AbortController`, clase `Movie`, funciones puras y `localStorage`."
 4. **Visualizacion:** "Leaflet muestra paises de produccion y Chart.js resume generos y popularidad."
 5. **Experiencia de usuario:** "Tiene tema persistente, filtros, historial, modal accesible y diseno responsive."

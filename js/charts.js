@@ -3,8 +3,16 @@ let popularityChart;
 
 // Paleta compartida por ambas graficas para que el analisis visual tenga
 // continuidad entre generos y popularidad.
-const palette = ["#d13239", "#f0b84b", "#2dd4bf", "#60a5fa", "#a78bfa", "#f97316", "#22c55e"];
-const emptyColor = "#37313a";
+const CHART_COLORS = [
+  "#d13239",
+  "#f0b84b",
+  "#2dd4bf",
+  "#60a5fa",
+  "#a78bfa",
+  "#f97316",
+  "#22c55e"
+];
+const EMPTY_CHART_COLOR = "#37313a";
 
 const getChart = () => {
   if (!window.Chart) {
@@ -26,7 +34,7 @@ export const initCharts = ({ genreCanvas, popularityCanvas }) => {
     type: "doughnut",
     data: {
       labels: ["Sin datos"],
-      datasets: [{ data: [1], backgroundColor: [emptyColor] }]
+      datasets: [{ data: [1], backgroundColor: [EMPTY_CHART_COLOR] }]
     },
     options: {
       maintainAspectRatio: false,
@@ -68,7 +76,9 @@ export const updateGenreChart = (genreCounts) => {
 
   genreChart.data.labels = labels;
   genreChart.data.datasets[0].data = data;
-  genreChart.data.datasets[0].backgroundColor = entries.length ? palette : [emptyColor];
+  genreChart.data.datasets[0].backgroundColor = entries.length
+    ? CHART_COLORS
+    : [EMPTY_CHART_COLOR];
   genreChart.options.plugins.legend.labels.color = chartTextColor();
   genreChart.update();
 };
@@ -82,7 +92,7 @@ export const updatePopularityChart = (dataset) => {
   popularityChart.data.labels = labels;
   popularityChart.data.datasets[0].data = data;
   popularityChart.data.datasets[0].backgroundColor = labels.map(
-    (_, index) => palette[index % palette.length]
+    (_, index) => CHART_COLORS[index % CHART_COLORS.length]
   );
   popularityChart.options.scales.x.ticks.color = chartTextColor();
   popularityChart.options.scales.y.ticks.color = chartTextColor();

@@ -6,6 +6,8 @@ const BASE_URL = "https://api.themoviedb.org/3";
 const DEFAULT_LANGUAGE = "es-ES";
 const API_KEY_STORAGE_KEY = "cinedata:tmdb-api-key";
 
+export const TMDB_RESULTS_PER_PAGE = 20;
+
 const normalizeApiKey = (apiKey) => String(apiKey || "").trim();
 
 const getStoredApiKey = () => {
@@ -19,10 +21,6 @@ const getStoredApiKey = () => {
 const getConfiguredApiKey = () => {
   const storedApiKey = getStoredApiKey();
   return storedApiKey || normalizeApiKey(TMDB_API_KEY);
-};
-
-export const isApiConfigured = () => {
-  return !!getConfiguredApiKey();
 };
 
 const fetchFromTmdb = async (endpoint, params = {}, options = {}) => {
@@ -42,7 +40,7 @@ const fetchFromTmdb = async (endpoint, params = {}, options = {}) => {
   const response = await fetch(url, { signal: options.signal });
 
   if (!response.ok) {
-    throw new Error(`TMDb respondió con estado ${response.status}`);
+    throw new Error(`TMDb respondio con estado ${response.status}`);
   }
 
   return response.json();
@@ -77,4 +75,3 @@ export const getPopularMovies = async (page = 1, options = {}) => {
 export const getMovieDetails = async (movieId, options = {}) => {
   return fetchFromTmdb(`/movie/${movieId}`, {}, options);
 };
-+3
