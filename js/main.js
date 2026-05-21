@@ -24,6 +24,8 @@ import { debounce, formatCountryCount, isAbortError } from "./utils.js";
 
 const INITIAL_DATASET_PAGES = 5;
 
+// Estado central de la aplicacion. Mantenerlo en un solo objeto facilita explicar
+// que la UI se repinta a partir de datos, filtros y seleccion actual.
 const state = {
   genres: [],
   movies: [],
@@ -62,6 +64,8 @@ const refreshVisuals = () => {
 };
 
 const scheduleVisualRefresh = () => {
+  // Leaflet y Chart.js necesitan recalcular tamanos despues de abrir el modal.
+  // Se repite en varios frames para cubrir animaciones/layout responsive.
   refreshVisuals();
   requestAnimationFrame(refreshVisuals);
   setTimeout(refreshVisuals, 120);
@@ -126,6 +130,7 @@ const applyTheme = (theme) => {
 };
 
 const loadDatasetMovies = async (pages = INITIAL_DATASET_PAGES) => {
+  // Carga paralela de paginas populares para tener una muestra inicial amplia.
   const requests = Array.from({ length: pages }, (_, index) => getPopularMovies(index + 1));
   const responses = await Promise.all(requests);
 
@@ -189,6 +194,7 @@ const resetSearch = () => {
 };
 
 const loadMovieDetails = async (movieId, signal) => {
+  // Cache local en memoria: si se abre la misma pelicula otra vez, no se repite la API.
   if (state.detailCache.has(movieId)) return state.detailCache.get(movieId);
 
   const details = await getMovieDetails(movieId, { signal });
@@ -200,6 +206,7 @@ const runSearch = async (query, page = 1) => {
   const cleanQuery = query.trim();
 
   if (page === 1) {
+    // Cancela busquedas anteriores para evitar que una respuesta vieja pise la nueva.
     state.searchController?.abort();
   }
 
@@ -243,6 +250,8 @@ const selectMovie = async (movieId) => {
   const selectedMovie = state.movies.find((movie) => movie.id === movieId);
   if (!selectedMovie) return;
 
+  // Cada seleccion tiene su propio controlador: al cambiar de pelicula se cancela
+  // la ficha anterior y se evitan actualizaciones de UI fuera de orden.
   state.detailController?.abort();
   const controller = new AbortController();
   state.detailController = controller;
@@ -286,6 +295,7 @@ const selectMovie = async (movieId) => {
 const bindEvents = () => {
   const debouncedSearch = debounce((event) => runSearch(event.target.value));
 
+  // Eventos de entrada: busqueda inmediata con debounce y submit tradicional.
   elements.searchInput.addEventListener("input", debouncedSearch);
   elements.searchForm.addEventListener("submit", (event) => {
     event.preventDefault();
@@ -333,6 +343,7 @@ const initTheme = () => {
 
 const initApp = async () => {
   try {
+    // Orden de arranque: tema, visualizaciones, eventos y finalmente datos remotos.
     initTheme();
     initMap("map");
     initCharts({

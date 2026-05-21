@@ -18,6 +18,7 @@
 </head>
 
 <body>
+  <!-- Cabecera global: marca, descripcion breve y control de tema persistente. -->
   <header class="app-header">
     <div class="brand">
       <img class="brand-logo" src="./img/logo.svg" alt="" aria-hidden="true" />
@@ -31,6 +32,7 @@
   </header>
 
   <main class="app-shell">
+    <!-- Panel de control: busqueda, filtros e historial guardado en localStorage. -->
     <section class="search-panel" aria-labelledby="searchTitle">
       <button id="toggleFilters" class="filters-toggle is-collapsed" type="button" aria-expanded="false"
         aria-controls="filtersContent">Filtros</button>
@@ -42,7 +44,7 @@
         <form class="search-form" id="searchForm">
           <label class="sr-only" for="searchInput">Buscar pelicula</label>
           <input id="searchInput" name="query" type="search" placeholder="Matrix, Amelie, Parasite..."
-            autocomplete="off" />
+             />
           <div class="search-actions">
             <button type="submit">Buscar</button>
             <button id="clearFilters" type="button">Limpiar filtros</button>
@@ -67,6 +69,7 @@
       </div>
     </section>
 
+    <!-- Resultados dinamicos: render.js inserta aqui las tarjetas de peliculas. -->
     <section class="results-panel" aria-labelledby="resultsTitle">
       <div class="section-heading">
         <h2 id="resultsTitle">Resultados</h2>
@@ -79,6 +82,7 @@
 
   </main>
 
+  <!-- Modal de detalle: ficha enriquecida, mapa Leaflet y graficas Chart.js. -->
   <div class="detail-modal" id="detailModal" role="dialog" aria-modal="true" aria-labelledby="detailModalTitle"
     hidden>
     <article class="detail-dialog">

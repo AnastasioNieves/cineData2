@@ -1,3 +1,5 @@
+// Funciones puras: reciben una coleccion y devuelven una nueva sin modificar el
+// estado original. Esto facilita explicar y probar la logica de filtrado.
 export const filterByGenre = (movies, genreId) =>
   genreId
     ? movies.filter((movie) => movie.hasGenre(Number(genreId)))
@@ -17,6 +19,8 @@ export const applyMovieFilters = (
   movies,
   { genreId, year, minRating }
 ) =>
+  // Composicion de filtros independientes: cada control puede activarse sin
+  // mezclar responsabilidades ni duplicar condiciones.
   filterByRating(
     filterByYear(
       filterByGenre(movies, genreId),
@@ -45,9 +49,8 @@ export const toPopularityDataset = (movies) =>
       title: movie.title,
       popularity: Number(movie.popularity.toFixed(1))
     }));
-  
-  
-  export const getGenresWithCount = (movies, genresCatalog) =>
+
+export const getGenresWithCount = (movies, genresCatalog) =>
   genresCatalog.map((genre) => {
     const count = movies.filter((movie) =>
       movie.hasGenre(genre.id)
