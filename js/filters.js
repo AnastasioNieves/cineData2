@@ -1,32 +1,13 @@
-// Funciones puras: reciben una coleccion y devuelven una nueva sin modificar el
-// estado original. Esto facilita explicar y probar la logica de filtrado.
-export const filterByGenre = (movies, genreId) =>
-  genreId
-    ? movies.filter((movie) => movie.hasGenre(Number(genreId)))
-    : [...movies];
+const POPULARITY_CHART_LIMIT = 7;
 
-export const filterByYear = (movies, year) =>
-  year
-    ? movies.filter((movie) => movie.isFromYear(Number(year)))
-    : [...movies];
-
-export const filterByRating = (movies, minRating) =>
-  minRating
-    ? movies.filter((movie) => movie.hasMinimumRating(Number(minRating)))
-    : [...movies];
-
-export const applyMovieFilters = (
-  movies,
-  { genreId, year, minRating }
-) =>
-  // Composicion de filtros independientes: cada control puede activarse sin
-  // mezclar responsabilidades ni duplicar condiciones.
-  filterByRating(
-    filterByYear(
-      filterByGenre(movies, genreId),
-      year
-    ),
-    minRating
+// Funciones puras: reciben una coleccion y devuelven datos nuevos sin modificar
+// el estado original. Esto facilita explicar y probar la logica de filtrado.
+export const applyMovieFilters = (movies, { genreId, year, minRating }) =>
+  movies.filter(
+    (movie) =>
+      movie.hasGenre(genreId) &&
+      movie.isFromYear(year) &&
+      movie.hasMinimumRating(minRating)
   );
 
 export const countGenres = (movies) =>
@@ -44,20 +25,25 @@ export const toPopularityDataset = (movies) =>
       (firstMovie, secondMovie) =>
         secondMovie.popularity - firstMovie.popularity
     )
-    .slice(0, 7)
+    .slice(0, POPULARITY_CHART_LIMIT)
     .map((movie) => ({
       title: movie.title,
       popularity: Number(movie.popularity.toFixed(1))
     }));
 
-export const getGenresWithCount = (movies, genresCatalog) =>
-  genresCatalog.map((genre) => {
-    const count = movies.filter((movie) =>
-      movie.hasGenre(genre.id)
-    ).length;
+export const getGenresWithCount = (movies, genresCatalog) => {
+  const genreCounts = movies.reduce((counts, movie) => {
+    movie.genreIds.forEach((genreId) => {
+      counts[genreId] = (counts[genreId] || 0) + 1;
+    });
 
+    return counts;
+  }, {});
+
+  return genresCatalog.map((genre) => {
     return {
       ...genre,
-      count
+      count: genreCounts[genre.id] || 0
     };
   });
+};

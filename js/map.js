@@ -1,16 +1,18 @@
 import { getCountryLocations } from "./countriesApi.js";
+import {
+  BASE_MAP_PANE,
+  MAP_REFRESH_DELAY,
+  MARKER_PANE,
+  WORLD_IMAGE_BOUNDS,
+  WORLD_MAP_URL
+} from "./map/mapConfig.js";
+import { createProductionIcon } from "./map/productionIcon.js";
+import { renderPins } from "./map/pinLayer.js";
+import { toMapPoint } from "./map/mapProjection.js";
+import { escapeHtml } from "./utils.js";
 
 // El mapa usa Leaflet con CRS.Simple sobre una imagen mundial fija. Esa decision
 // permite mostrar siempre el mundo completo dentro del modal sin scroll ni zoom.
-const BASE_MAP_PANE = "worldMapImage";
-const MARKER_PANE = "productionMarkers";
-const WORLD_MAP_URL =
-  "https://upload.wikimedia.org/wikipedia/commons/5/51/BlankMap-Equirectangular.svg";
-const WORLD_IMAGE_BOUNDS = [
-  [0, 0],
-  [180, 360]
-];
-
 let map;
 let markersLayer;
 let mapElement;
@@ -24,21 +26,6 @@ const getLeaflet = () => {
   return window.L;
 };
 
-const escapeHtml = (value = "") =>
-  String(value).replace(/[&<>"']/g, (character) => {
-    const replacements = {
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#039;"
-    };
-
-    return replacements[character];
-  });
-
-const toMapPoint = ([latitude, longitude]) => [latitude + 90, longitude + 180];
-
 const fitWholeWorld = () => {
   map.invalidateSize({ pan: false });
   map.fitBounds(WORLD_IMAGE_BOUNDS, {
@@ -47,50 +34,12 @@ const fitWholeWorld = () => {
   });
 };
 
-const createProductionIcon = () =>
-  getLeaflet().divIcon({
-    className: "leaflet-div-icon production-dot-icon",
-    html:
-      '<span class="production-dot" aria-hidden="true" style="display:block;width:20px;height:20px;border:3px solid #ffffff;border-radius:50%;background:#c0262e;box-shadow:0 0 0 4px rgba(192,38,46,0.22),0 10px 18px rgba(0,0,0,0.34);"></span>',
-    iconAnchor: [13, 13],
-    iconSize: [26, 26],
-    popupAnchor: [0, -13]
-  });
-
-const getPinPosition = ([latitude, longitude]) => ({
-  left: `${((longitude + 180) / 360) * 100}%`,
-  top: `${((90 - latitude) / 180) * 100}%`
-});
-
 const openCountryPopup = (country) => {
   getLeaflet()
     .popup()
     .setLatLng(toMapPoint(country.latlng))
     .setContent(`<strong>${escapeHtml(country.name)}</strong><br>${escapeHtml(country.iso_3166_1)}`)
     .openOn(map);
-};
-
-const renderPins = (locations = []) => {
-  pinLayer.innerHTML = "";
-
-  // Capa HTML adicional para que las chinchetas sean faciles de estilizar y enfocar.
-  locations.forEach((country) => {
-    const button = document.createElement("button");
-    const position = getPinPosition(country.latlng);
-
-    button.type = "button";
-    button.className = "map-pin";
-    button.style.left = position.left;
-    button.style.top = position.top;
-    button.title = `${country.name} (${country.iso_3166_1})`;
-    button.setAttribute("aria-label", `Chincheta de ${country.name}`);
-    button.addEventListener("click", (event) => {
-      event.stopPropagation();
-      openCountryPopup(country);
-    });
-
-    pinLayer.append(button);
-  });
 };
 
 export const initMap = (elementId) => {
@@ -133,7 +82,7 @@ export const initMap = (elementId) => {
   map.setMaxBounds(WORLD_IMAGE_BOUNDS);
   map.on("resize", fitWholeWorld);
 
-  setTimeout(fitWholeWorld, 80);
+  setTimeout(fitWholeWorld, MAP_REFRESH_DELAY);
   return map;
 };
 
@@ -155,7 +104,7 @@ export const updateProductionMap = async (countries = [], options = {}) => {
   if (options.signal?.aborted) return [];
 
   markersLayer.clearLayers();
-  renderPins();
+  renderPins(pinLayer);
 
   const locations = await getCountryLocations(countries);
   if (options.signal?.aborted) return [];
@@ -164,7 +113,7 @@ export const updateProductionMap = async (countries = [], options = {}) => {
   locations.forEach((country) => {
     L.marker(toMapPoint(country.latlng), {
       alt: `Chincheta de ${country.name}`,
-      icon: createProductionIcon(),
+      icon: createProductionIcon(L),
       keyboard: true,
       pane: MARKER_PANE,
       title: `${country.name} (${country.iso_3166_1})`
@@ -175,9 +124,9 @@ export const updateProductionMap = async (countries = [], options = {}) => {
       );
   });
 
-  renderPins(locations);
+  renderPins(pinLayer, locations, openCountryPopup);
   fitWholeWorld();
 
-  setTimeout(fitWholeWorld, 80);
+  setTimeout(fitWholeWorld, MAP_REFRESH_DELAY);
   return locations;
 };

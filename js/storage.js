@@ -24,14 +24,14 @@ export const getSearchHistory = () => {
   return readJson(HISTORY_KEY, []);
 };
 
-export const createSearchHistory = (history, term) => {
+const createSearchHistory = (history, term) => {
   const normalizedTerm = term.trim();
   if (!normalizedTerm) return [...history];
 
   // Inserta la busqueda reciente arriba, elimina duplicados y conserva un maximo.
   return [
     normalizedTerm,
-    ...history.filter((item) => item.toLocaleLowerCase() !== normalizedTerm.toLocaleLowerCase())
+    ...history.filter((item) => item.toLowerCase() !== normalizedTerm.toLowerCase())
   ].slice(0, HISTORY_LIMIT);
 };
 
