@@ -33,7 +33,7 @@ export const resetFilters = async () => {
   setMessage("");
 };
 
-export const resetSearch = () => {
+const resetSearch = () => {
   resetResultsState();
   clearSelection();
   renderResultsView(state);

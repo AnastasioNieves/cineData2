@@ -58,7 +58,7 @@ const normalizeCountryResponse = (payload, fallbackName, code) => {
   };
 };
 
-export const getCountryLocation = async ({ iso_3166_1: code, name } = {}) => {
+const getCountryLocation = async ({ iso_3166_1: code, name } = {}) => {
   if (!code) return null;
 
   const normalizedCode = String(code).trim().toUpperCase();

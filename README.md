@@ -44,6 +44,7 @@ La aplicacion esta separada por responsabilidades para que cada archivo tenga un
 cineData/
   index.html
   README.md
+  BRANDING_GUIDE.md
   css/
     styles.css
   img/
@@ -219,7 +220,7 @@ Tambien puedes usar la extension Live Server de VS Code.
 ## Guion rapido de defensa
 
 1. **Objetivo:** "CineData Explorer permite buscar peliculas y cruzar datos de cine con paises, generos y popularidad."
-2. **Arquitectura:** "La app esta separada en modulos: API, modelo, filtros, render, mapa, graficas y persistencia."
+2. **Arquitectura:** "La app separa entrada, controladores, servicios, estado, vistas, renderizadores, API y persistencia."
 3. **JavaScript avanzado:** "Uso `async/await`, `AbortController`, clase `Movie`, funciones puras y `localStorage`."
 4. **Visualizacion:** "Leaflet muestra paises de produccion y Chart.js resume generos y popularidad."
 5. **Experiencia de usuario:** "Tiene tema persistente, filtros, historial, modal accesible y diseno responsive."
